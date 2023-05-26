@@ -1,0 +1,65 @@
+
+--DROP table public."car"
+
+CREATE TABLE public.car (
+	id serial4 NOT NULL,
+	model varchar NOT NULL,
+	make varchar NOT NULL,
+	productionyear int4 NOT NULL,
+	locationId int not null,
+	CONSTRAINT car_make_check CHECK ((char_length((make)::text) < 50)),
+	CONSTRAINT car_model_check CHECK ((char_length((model)::text) < 50)),
+	CONSTRAINT car_pkey PRIMARY KEY (id),
+	CONSTRAINT car_productionyear_check CHECK ((productionyear > 1900)),
+	CONSTRAINT fk_car_location_locationid FOREIGN KEY (locationId) REFERENCES public."location"(id)
+);
+
+
+CREATE TABLE public."registration" (
+    carId int4 NOT NULL UNIQUE,
+    registrationNumber varchar NOT NULL,
+    registrationDate date NOT NULL,
+    CONSTRAINT registration_pkey PRIMARY KEY (carId),
+    CONSTRAINT fk_registration_car FOREIGN KEY (carId) REFERENCES public."car" (id)
+);
+
+--DROP table cascade public."location";
+
+CREATE TABLE public."location" (
+	id serial4 NOT NULL,
+	city varchar NOT NULL,
+	CONSTRAINT location_city_check CHECK ((char_length((city)::text) < 50)),
+	CONSTRAINT location_pkey PRIMARY KEY (id)
+);
+
+--drop table cascade public."rental"
+
+create table public."rental"(
+	id serial4 not null,
+	startDate date not null,
+	finishDate date not null,
+	carId int not null,
+	customerId int not null,
+	CONSTRAINT rental_pkey PRIMARY KEY (id),
+	constraint fk_rental_car_carId foreign KEY(carId) references public."car"(id),
+	constraint fk_rental_customer_customerId foreign KEY(customerId) references public."customer"(id)
+);
+
+--drop table public."customer"
+
+create table public."customer"(
+	id serial4 not null,
+	firstName varchar not null,
+	lastName varchar not null,
+	CONSTRAINT customer_pkey PRIMARY KEY (id),
+	CONSTRAINT customer_fName_check CHECK ((char_length((firstName)::text) < 50)),
+	CONSTRAINT customer_lName_check CHECK ((char_length((lastName)::text) < 50))
+);
+
+create table public."customerHistory"(
+	customerId int not null,
+	rentalId int not null,
+	CONSTRAINT customerHistory_pkey PRIMARY KEY (customerId,rentalId),
+	constraint fk__customerHistory_customer foreign KEY(customerId) references public."customer"(id),
+	constraint fk__customerHistory_rental foreign KEY(rentalId) references public."rental"(id)
+);
