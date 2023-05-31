@@ -1,65 +1,59 @@
 
---DROP table public."car"
+DROP table public."Car"
 
-CREATE TABLE public.car (
-	id serial4 NOT NULL,
-	model varchar NOT NULL,
-	make varchar NOT NULL,
-	productionyear int4 NOT NULL,
-	locationId int not null,
-	CONSTRAINT car_make_check CHECK ((char_length((make)::text) < 50)),
-	CONSTRAINT car_model_check CHECK ((char_length((model)::text) < 50)),
-	CONSTRAINT car_pkey PRIMARY KEY (id),
-	CONSTRAINT car_productionyear_check CHECK ((productionyear > 1900)),
-	CONSTRAINT fk_car_location_locationid FOREIGN KEY (locationId) REFERENCES public."location"(id)
+CREATE TABLE public."Car" (
+	"Id" uuid NOT NULL,
+	"Model" varchar NOT NULL,
+	"Make" varchar NOT NULL,
+	"Productionyear" int4 NOT NULL,
+	"LocationId" uuid not null,
+	CONSTRAINT car_make_check CHECK ((char_length(("Make")::text) < 50)),
+	CONSTRAINT car_model_check CHECK ((char_length(("Model")::text) < 50)),
+	CONSTRAINT car_pkey PRIMARY KEY ("Id"),
+	CONSTRAINT car_productionyear_check CHECK (("Productionyear" > 1900)),
+	CONSTRAINT fk_car_location_locationid FOREIGN KEY ("LocationId") REFERENCES public."Location"("Id")
 );
 
+drop table public."Registration"
 
-CREATE TABLE public."registration" (
-    carId int4 NOT NULL UNIQUE,
-    registrationNumber varchar NOT NULL,
-    registrationDate date NOT NULL,
-    CONSTRAINT registration_pkey PRIMARY KEY (carId),
-    CONSTRAINT fk_registration_car FOREIGN KEY (carId) REFERENCES public."car" (id)
+CREATE TABLE public."Registration" (
+    "CarId" uuid NOT NULL UNIQUE,
+    "RegistrationNumber" varchar NOT NULL,
+    "RegistrationDate" date NOT NULL,
+    CONSTRAINT registration_pkey PRIMARY KEY ("CarId"),
+    CONSTRAINT fk_registration_car FOREIGN KEY ("CarId") REFERENCES public."Car" ("Id")
 );
 
---DROP table cascade public."location";
+DROP table public."Location"
 
-CREATE TABLE public."location" (
-	id serial4 NOT NULL,
-	city varchar NOT NULL,
-	CONSTRAINT location_city_check CHECK ((char_length((city)::text) < 50)),
-	CONSTRAINT location_pkey PRIMARY KEY (id)
+CREATE TABLE public."Location" (
+	"Id" uuid NOT NULL,
+	"City" varchar NOT NULL,
+	CONSTRAINT location_city_check CHECK ((char_length(("City")::text) < 50)),
+	CONSTRAINT location_pkey PRIMARY KEY ("Id")
 );
 
---drop table cascade public."rental"
+drop table public."Rental"
 
-create table public."rental"(
-	id serial4 not null,
-	startDate date not null,
-	finishDate date not null,
-	carId int not null,
-	customerId int not null,
-	CONSTRAINT rental_pkey PRIMARY KEY (id),
-	constraint fk_rental_car_carId foreign KEY(carId) references public."car"(id),
-	constraint fk_rental_customer_customerId foreign KEY(customerId) references public."customer"(id)
+create table public."Rental"(
+	"Id" uuid not null,
+	"StartDate" date not null,
+	"FinishDate" date not null,
+	"CarId" uuid not null,
+	"CustomerId" uuid not null,
+	CONSTRAINT rental_pkey PRIMARY KEY ("Id"),
+	constraint fk_rental_car_carId foreign KEY("CarId") references public."Car"("Id"),
+	constraint fk_rental_customer_customerId foreign KEY("CustomerId") references public."Customer"("Id")
 );
 
---drop table public."customer"
+drop table public."Customer"
 
-create table public."customer"(
-	id serial4 not null,
-	firstName varchar not null,
-	lastName varchar not null,
-	CONSTRAINT customer_pkey PRIMARY KEY (id),
-	CONSTRAINT customer_fName_check CHECK ((char_length((firstName)::text) < 50)),
-	CONSTRAINT customer_lName_check CHECK ((char_length((lastName)::text) < 50))
+create table public."Customer"(
+	"Id" uuid not null,
+	"FirstName" varchar not null,
+	"LastName" varchar not null,
+	CONSTRAINT customer_pkey PRIMARY KEY ("Id"),
+	CONSTRAINT customer_fName_check CHECK ((char_length(("FirstName")::text) < 50)),
+	CONSTRAINT customer_lName_check CHECK ((char_length(("LastName")::text) < 50))
 );
 
-create table public."customerHistory"(
-	customerId int not null,
-	rentalId int not null,
-	CONSTRAINT customerHistory_pkey PRIMARY KEY (customerId,rentalId),
-	constraint fk__customerHistory_customer foreign KEY(customerId) references public."customer"(id),
-	constraint fk__customerHistory_rental foreign KEY(rentalId) references public."rental"(id)
-);
